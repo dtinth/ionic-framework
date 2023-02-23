@@ -22,7 +22,7 @@ const projects: Project<PlaywrightTestOptions, PlaywrightWorkerOptions>[] = [
        */
       viewport: {
         width: 393,
-        height: 727
+        height: 727,
       },
     },
   },
@@ -30,16 +30,16 @@ const projects: Project<PlaywrightTestOptions, PlaywrightWorkerOptions>[] = [
     name: 'Mobile Chrome',
     use: {
       browserName: 'chromium',
-      ...devices['Pixel 5']
-    }
+      ...devices['Pixel 5'],
+    },
   },
   {
     name: 'Mobile Safari',
     use: {
       browserName: 'webkit',
-      ...devices['iPhone 12']
-    }
-  }
+      ...devices['iPhone 12'],
+    },
+  },
 ];
 
 const modes = ['ios', 'md'];
@@ -47,29 +47,29 @@ const modes = ['ios', 'md'];
 const generateProjects = () => {
   const projectsWithMetadata: Project<PlaywrightTestOptions, PlaywrightWorkerOptions>[] = [];
 
-  modes.forEach(mode => {
-    projects.forEach(project => {
+  modes.forEach((mode) => {
+    projects.forEach((project) => {
       projectsWithMetadata.push({
         ...project,
         metadata: {
           mode,
           rtl: false,
-          _testing: true
-        }
+          _testing: true,
+        },
       });
       projectsWithMetadata.push({
         ...project,
         metadata: {
           mode,
           rtl: true,
-          _testing: true
-        }
+          _testing: true,
+        },
       });
     });
   });
 
   return projectsWithMetadata;
-}
+};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -81,7 +81,7 @@ const config: PlaywrightTestConfig = {
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 5000
+    timeout: 5000,
   },
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
@@ -105,6 +105,7 @@ const config: PlaywrightTestConfig = {
      */
     trace: 'retain-on-failure',
     baseURL: 'http://localhost:3333',
+    video: 'on',
   },
 
   /* Configure projects for major browsers */
@@ -112,8 +113,8 @@ const config: PlaywrightTestConfig = {
   webServer: {
     command: 'serve -p 3333',
     port: 3333,
-    reuseExistingServer: !process.env.CI
-  }
+    reuseExistingServer: !process.env.CI,
+  },
 };
 
 export default config;
