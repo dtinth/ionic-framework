@@ -11,7 +11,29 @@ concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  AZURE_STORAGE_ACCOUNT_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING }}
+
 jobs:
+  prepare-for-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Checkout the latest commit in this branch
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./core
+        shell: bash
+      - name: Init Test Queue
+        run: node scripts/test-queue/init.mjs
+        working-directory: ./core
+        shell: bash
+
   build-core:
     runs-on: ubuntu-latest
     steps:
@@ -32,7 +54,7 @@ jobs:
         # to be the length of the shard array.
         shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         totalShards: [20]
-    needs: [build-core]
+    needs: [build-core, prepare-for-testing]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
