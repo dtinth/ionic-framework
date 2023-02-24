@@ -48,7 +48,9 @@ async function worker() {
         process.exitCode = 1;
       } finally {
         clearTimeout(heartbeatInterval);
-        await queue.deleteMessage(item.messageId, item.popReceipt);
+        await queue.deleteMessage(item.messageId, item.popReceipt).catch((error) => {
+          console.error(`Unable to delete message ${item.messageId}: ${error}`);
+        });
       }
     }
   }
