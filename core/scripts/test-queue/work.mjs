@@ -23,12 +23,17 @@ async function worker() {
       }
     }
     for (const item of result.receivedMessageItems) {
-      const heartbeatInterval = setInterval(async () => {
-        try {
-          await queue.updateMessage(item.messageId, item.popReceipt, undefined, 30);
-        } catch (error) {
-          console.error(`Unable to perform heartbeat on ${item.messageId}`);
-        }
+      let popReceipt = item.popReceipt;
+      let currentHeartbeat = Promise.resolve();
+      const heartbeatInterval = setInterval(() => {
+        currentHeartbeat = currentHeartbeat.then(async () => {
+          try {
+            const result = await queue.updateMessage(item.messageId, popReceipt, undefined, 30);
+            popReceipt = result.popReceipt || popReceipt;
+          } catch (error) {
+            console.error(`Unable to perform heartbeat on ${item.messageId}: ${error}`);
+          }
+        });
       }, 15e3);
       try {
         const id = item.messageText;
@@ -48,8 +53,12 @@ async function worker() {
         process.exitCode = 1;
       } finally {
         clearTimeout(heartbeatInterval);
-        await queue.deleteMessage(item.messageId, item.popReceipt).catch((error) => {
-          console.error(`Unable to delete message ${item.messageId}: ${error}`);
+        currentHeartbeat.then(async () => {
+          try {
+            await queue.deleteMessage(item.messageId, popReceipt);
+          } catch (error) {
+            console.error(`Unable to delete message ${item.messageId}: ${error}`);
+          }
         });
       }
     }
