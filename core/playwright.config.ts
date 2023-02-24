@@ -90,7 +90,7 @@ const config: PlaywrightTestConfig = {
   /* Flaky test should be either addressed or disabled until we can address them */
   retries: 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: 2, //process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -105,7 +105,6 @@ const config: PlaywrightTestConfig = {
      */
     trace: 'retain-on-failure',
     baseURL: 'http://localhost:3333',
-    video: 'on',
   },
 
   /* Configure projects for major browsers */

@@ -24,7 +24,8 @@ runs:
       working-directory: ./core
     - name: Test
       if: inputs.update != 'true'
-      run: npm run test.e2e -- --shard=${{ inputs.shard }}/${{ inputs.totalShards }}
+      # run: npm run test.e2e -- --shard=${{ inputs.shard }}/${{ inputs.totalShards }}
+      run: npm run test.e2e.queue
       shell: bash
       working-directory: ./core
     - name: Test and Update

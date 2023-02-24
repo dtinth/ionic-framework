@@ -13,13 +13,13 @@ async function worker() {
       console.log('Did not get a new message. Checking queue size...');
       const properties = await queue.getProperties();
       const n = properties.approximateMessagesCount;
-      console.log(`Approximate number of messages in queue: ${n}`)
+      console.log(`Approximate number of messages in queue: ${n}`);
       if (n === 0) {
         console.log('Queue is fully drained now.');
         return;
       } else {
         console.log('Waiting a while before checking again.');
-        await new Promise(r => setTimeout(r, 5e3));
+        await new Promise((r) => setTimeout(r, 5e3));
       }
     }
     for (const item of result.receivedMessageItems) {
@@ -36,10 +36,16 @@ async function worker() {
         if (!job) {
           throw new Error(`Unable to find job by ID: ${id}`);
         }
-        console.log('Work on', id);
-        await new Promise(r => setTimeout(r, 5e3));
+        console.log('Work on', job.name);
+        try {
+          console.log(`::group::${job.name}`);
+          await job.run();
+        } finally {
+          console.log('::endgroup::');
+        }
       } catch (error) {
         console.error(`Job ${item.messageId} failed: ${error}`);
+        process.exitCode = 1;
       } finally {
         clearTimeout(heartbeatInterval);
         await queue.deleteMessage(item.messageId, item.popReceipt);
